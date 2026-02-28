@@ -7,13 +7,13 @@ import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 
-import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.logging.Level;
 
+import static org.testng.Assert.assertFalse;
 
 public class JavaScriptErrorTests {
 
@@ -35,12 +35,19 @@ public class JavaScriptErrorTests {
     public void javaScriptAlertPromptTest() {
 
         LogEntries browserLogs = driver.manage().logs().get(LogType.BROWSER);
+        boolean isErrorLog = false;
 
         for (LogEntry browserLog : browserLogs) {
             if (isErrorPresent(browserLog)) {
-                Assert.fail("Abort further processing due to: " + browserLog.getMessage());
+                System.out.println("Error message detected: " + browserLog.getMessage());
+                isErrorLog = true;
             }
         }
+        assertFalse(isErrorLog);
+    }
+
+    private boolean isErrorPresent(LogEntry browserLog) {
+        return browserLog.getMessage().contains("TypeError");
     }
 
     @AfterMethod
@@ -48,9 +55,5 @@ public class JavaScriptErrorTests {
         if (driver != null) {
             driver.quit();
         }
-    }
-
-    private boolean isErrorPresent(LogEntry browserLog) {
-        return browserLog.getMessage().contains("TypeError");
     }
 }
